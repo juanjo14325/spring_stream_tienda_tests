@@ -4,10 +4,15 @@ import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
 import org.iesvdm.tienda.repository.ProductoRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.function.BiFunction;
 
 
 @SpringBootTest
@@ -47,7 +52,16 @@ class TiendaApplicationTests {
 	@Test
 	void test1() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listNomPrec = listProds.stream()
+		.map(s -> "Nombre: " + s.getNombre() + " Precio: " + s.getPrecio())
+		.toList();
+		listNomPrec.forEach( x-> System.out.println(x));
+
+		Assertions.assertEquals(11, listNomPrec.size());
+		Assertions.assertTrue(listNomPrec.contains("Nombre: Disco duro SATA3 1TB Precio: 86.99"));
+
+
 	}
 	
 	
@@ -57,7 +71,23 @@ class TiendaApplicationTests {
 	@Test
 	void test2() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var listPrecio= listProds.stream()
+			// .map(p -> p.getPrecio()*1.08)
+			// .map(prec -> BigDecimal.valueOf(prec).setScale(2, RoundingMode.HALF_UP))
+			// .map(prec -> prec + "$")
+			// .toList();
+			.map(prod -> prod.getNombre()
+					 + " con precio: "
+					  + BigDecimal.valueOf(prod.getPrecio()*1.08)
+						.setScale(2,RoundingMode.HALF_UP)+ "$")
+						.toList();
+
+		listPrecio.forEach( s -> System.out.println(s));
+		
+		Assertions.assertEquals(11, listPrecio.size());
+
+		Assertions.assertTrue(listPrecio.contains("Impresora HP Laserjet Pro M26nw con precio: 194.40$"));
 	}
 	
 	/**
@@ -66,7 +96,14 @@ class TiendaApplicationTests {
 	@Test
 	void test3() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		List <String> listResultado = listProds.stream()
+					.map( p -> p.getNombre().toUpperCase() + "precio: " + p.getPrecio()) 
+					.toList();
+
+		listResultado.forEach(str -> System.out.println(str));
+		
+		Assertions.assertEquals(11, listResultado.size());
 	}
 	
 	/**
@@ -75,7 +112,13 @@ class TiendaApplicationTests {
 	@Test
 	void test4() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		
+		listFabs.stream()
+				.map( n -> n.getNombre() + " " + n.getNombre().substring(0, 2))
+				.toList();
+
+		listFabs.forEach(s -> System.out.println(s));
+		
 	}
 	
 	/**
