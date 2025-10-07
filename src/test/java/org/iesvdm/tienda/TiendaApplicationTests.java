@@ -1,5 +1,6 @@
 package org.iesvdm.tienda;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
@@ -13,6 +14,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.BiFunction;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 
 
 @SpringBootTest
@@ -127,7 +131,13 @@ class TiendaApplicationTests {
 	@Test
 	void test5() {
 		var listFabs = fabRepo.findAll();
-		//TODO		
+        List<Integer> listCod = listFabs.stream()
+                .filter(fabricante -> fabricante.getProductos() != null
+                && !fabricante.getProductos().isEmpty())
+                .map(c -> c.getCodigo())
+                .toList();
+        listCod.forEach(c -> System.out.println(c));
+
 	}
 	
 	/**
@@ -136,16 +146,30 @@ class TiendaApplicationTests {
 	@Test
 	void test6() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+
+        var listOrd = listFabs.stream()
+                .sorted(comparing((Fabricante f) -> f.getNombre(),reverseOrder()))
+                .map(f -> f.getNombre())
+                .toList();
+        listOrd.forEach(f -> System.out.println(f));
 	}
 	
 	/**
-	 * 7. Lista los nombres de los productos ordenados en primer lugar por el nombre de forma ascendente y en segundo lugar por el precio de forma descendente.
+	 * 7. Lista los nombres de los productos ordenados en primer lugar por el nombre de
+     * forma ascendente y en segundo lugar por el precio de forma descendente.
 	 */
 	@Test
 	void test7() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+        var listAscDesc = listProds.stream()
+                .sorted(comparing((Producto p) -> p.getNombre())
+                .thenComparing((Producto p) -> p.getPrecio(),reverseOrder()))
+                .map(p-> p.getNombre()+ " " + p.getPrecio() )
+                .toList();
+        listAscDesc.forEach(System.out::println);
+        Assertions.assertEquals(11,listAscDesc.size());
+
 	}
 	
 	/**
@@ -154,7 +178,13 @@ class TiendaApplicationTests {
 	@Test
 	void test8() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+        var list5Fabs = listFabs.stream()
+                .limit(5)
+                .map(Fabricante::getNombre)
+                .toList();
+
+        list5Fabs.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -163,7 +193,16 @@ class TiendaApplicationTests {
 	@Test
 	void test9() {
 		var listFabs = fabRepo.findAll();
-		//TODO		
+        var list2Fabs = listFabs.stream()
+                .limit(5)
+                .skip(3)
+                .map(f -> f.getNombre())
+                .toList();
+        list2Fabs.forEach(System.out::println);
+
+
+
+
 	}
 	
 	/**
@@ -172,7 +211,12 @@ class TiendaApplicationTests {
 	@Test
 	void test10() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        var listMasBarato = listProds.stream()
+                .sorted(comparing((Producto p) -> p.getPrecio() ))
+                .map(p -> p.getNombre() +" "+ p.getPrecio())
+                .limit(1)
+                .toList();
+        listMasBarato.forEach(System.out::println);
 	}
 	
 	/**
@@ -181,7 +225,14 @@ class TiendaApplicationTests {
 	@Test
 	void test11() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        var listMasCaro = listProds.stream()
+                .sorted(comparing((Producto p) -> p.getPrecio(),reverseOrder()))
+                .map(p -> p.getNombre() +" "+ p.getPrecio())
+                .limit(1)
+                .toList();
+        listMasCaro.forEach(System.out::println);
+
+
 	}
 	
 	/**
@@ -191,7 +242,11 @@ class TiendaApplicationTests {
 	@Test
 	void test12() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var listNomP = listProds.stream()
+                .filter(p-> p.getFabricante().getCodigo()==2)
+                .map(p -> p.getNombre())
+                .toList();
+        listNomP.forEach(System.out::println);
 	}
 	
 	/**
@@ -200,7 +255,12 @@ class TiendaApplicationTests {
 	@Test
 	void test13() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        var listMenor = listProds.stream()
+                .filter(p -> p.getPrecio() <= 120)
+                .map(p -> p.getNombre())
+                .toList();
+        listMenor.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -209,7 +269,11 @@ class TiendaApplicationTests {
 	@Test
 	void test14() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        var listMayor = listProds.stream()
+                .filter(p -> p.getPrecio() >= 400)
+                .map(p -> p.getNombre())
+                .toList();
+        listMayor.forEach(System.out::println);
 	}
 	
 	/**
