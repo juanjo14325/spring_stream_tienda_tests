@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.Arrays;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
@@ -231,7 +232,20 @@ class TiendaApplicationTests {
                 .limit(1)
                 .toList();
         listMasCaro.forEach(System.out::println);
+		/* Optional <Producto> prodOpt = listProds.stream()
+		 *			.sorted(
+		 *				comparing(producto -> producto.getPrecio(), reverseOrder())	 								
+		 *			).findFirst();
+			if(prodOpt.isPresent()){
+			Producto prod = prodOpt.get();
+			System.out.println(prod.getNombre() + " " + prod.getPrecio());
 
+			}
+			prodOpt.ifPresent(x -> System.out.println(x.getNombre() + " " + x.getPrecio()))
+			prodOpt.ifPresentOrElse(x -> System.out.println(x.getNombre() + " " + x.getPrecio())
+			,() -> System.out.println("Sin resultado"))
+
+		 */
 
 	}
 	
@@ -282,7 +296,13 @@ class TiendaApplicationTests {
 	@Test
 	void test15() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var listRango = listProds.stream()
+						.filter(p -> p.getPrecio() >= 80 && p.getPrecio() <= 300)
+						.map(p -> p.getNombre())
+						.toList();
+		listRango.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -291,7 +311,11 @@ class TiendaApplicationTests {
 	@Test
 	void test16() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var listMayor200 = listProds.stream()
+							.filter(p -> p.getPrecio() > 200 && p.getFabricante().getCodigo() == 6)
+							.map(p -> p.getNombre())
+							.toList();
+		listMayor200.forEach(System.out::println);
 	}
 	
 	/**
@@ -300,7 +324,15 @@ class TiendaApplicationTests {
 	@Test
 	void test17() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var listProdsCod = listProds.stream()
+							.filter( p -> p.getFabricante().getCodigo() == 1 || 
+							p.getFabricante().getCodigo() == 3 || 
+							p.getFabricante().getCodigo() == 5 )
+							.map(Producto::getNombre)
+							.toList();
+		listProdsCod.forEach(System.out::println);
+
+
 	}
 	
 	/**
@@ -309,7 +341,14 @@ class TiendaApplicationTests {
 	@Test
 	void test18() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listProdsCent = listProds.stream()
+							.map(prod -> prod.getNombre()
+					 	+ " Precio: "
+					  	+ BigDecimal.valueOf((int) (prod.getPrecio()*100 )) + " céntimos")
+						.toList();
+
+		listProdsCent.forEach( s -> System.out.println(s));
 	}
 	
 	
@@ -319,7 +358,13 @@ class TiendaApplicationTests {
 	@Test
 	void test19() {
 		var listFabs = fabRepo.findAll();
-		//TODOS
+
+		var listNomS = listFabs.stream()
+						.filter( f -> f.getNombre().contains("S"))
+						.map(Fabricante::getNombre)
+						.toList();
+		listNomS.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -328,25 +373,50 @@ class TiendaApplicationTests {
 	@Test
 	void test20() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listPortatil = listProds.stream()
+							.filter(p -> p.getNombre().contains("Portátil") )
+							.map(Producto::getNombre)
+							.toList();
+
+		listPortatil.forEach(System.out::println);
+
 	}
 	
 	/**
-	 * 21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre y tienen un precio inferior a 215 €.
+	 * 21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre 
+	 * y tienen un precio inferior a 215 €.
 	 */
 	@Test
 	void test21() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var listMonitor = listProds.stream()
+							.filter(p -> p.getNombre().contains("Monitor") && p.getPrecio() < 215)
+							.map(Producto::getNombre)
+							.toList();
+
+		listMonitor.forEach(System.out::println);
+
+
 	}
 	
 	/**
 	 * 22. Lista el nombre y el precio de todos los productos que tengan un precio mayor o igual a 180€. 
-	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre (en orden ascendente).
+	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre
+	 * (en orden ascendente).
 	 */
+	@Test
 	void test22() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listProdAscDesc = listProds.stream()
+							.filter(p -> p.getPrecio() >= 180)
+							.sorted(comparing((Producto p) -> p.getPrecio())
+							.thenComparing((Producto p)  -> p.getNombre()))
+							.map(p -> p.getNombre() + " " + p.getPrecio())
+							.toList();
+
+		listProdAscDesc.forEach(System.out::println);
 	}
 	
 	/**
@@ -655,5 +725,5 @@ Hewlett-Packard              2
 		var listFabs = fabRepo.findAll();
 		//TODO
 	}
-
+	
 }
