@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
+import static org.junit.jupiter.api.DynamicTest.stream;
 
 
 @SpringBootTest
@@ -420,13 +421,22 @@ class TiendaApplicationTests {
 	}
 	
 	/**
-	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. 
+	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante
+	 * de todos los productos de la base de datos. 
 	 * Ordene el resultado por el nombre del fabricante, por orden alfabético.
 	 */
 	@Test
 	void test23() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var listaCompletaOrd = listProds.stream()
+							.sorted(comparing((Producto p) -> p.getNombre()))
+							.map( p -> p.getNombre() + " Precio: " + p.getPrecio() +
+							" Frabricante: " + p.getFabricante().getNombre())
+							.toList();
+		
+		listaCompletaOrd.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -435,7 +445,14 @@ class TiendaApplicationTests {
 	@Test
 	void test24() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var prodMasCaro = listProds.stream()
+						  .sorted( comparing(((Producto p)-> p.getPrecio()),reverseOrder()))
+						  .limit(1)
+						  .map( p -> p.getNombre() + " -> " + p.getPrecio() + " -> " + p.getFabricante().getNombre())
+						  .toList();
+		prodMasCaro.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -444,7 +461,14 @@ class TiendaApplicationTests {
 	@Test
 	void test25() {
 		var listProds = prodRepo.findAll();
-		//TODO	
+
+		var listCrucial = listProds.stream()
+						.filter( p -> p.getFabricante().getNombre().equals("Crucial") && p.getPrecio() > 200)
+						.map( p -> p.getNombre())
+						.toList();
+
+		listCrucial.forEach(System.out::println);
+
 	}
 	
 	/**
@@ -453,27 +477,46 @@ class TiendaApplicationTests {
 	@Test
 	void test26() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listFabricantes = listProds.stream()
+							.filter( p -> p.getFabricante().getNombre().equals("Asus") || 
+							p.getFabricante().getNombre().equals("Hewlett-Packard") ||
+							p.getFabricante().getNombre().equals("Seagate"))
+							.map( p -> p.getNombre())
+							.toList();
+
+		listFabricantes.forEach(System.out::println);					
 	}
 	
 	/**
-	 * 27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos que tengan un precio mayor o igual a 180€. 
+	 * 27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos que 
+	 * tengan un precio mayor o igual a 180€. 
 	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre.
-	 * El listado debe mostrarse en formato tabla. Para ello, procesa las longitudes máximas de los diferentes campos a presentar y compensa mediante la inclusión de espacios en blanco.
+	 * El listado debe mostrarse en formato tabla. Para ello, procesa las longitudes máximas de los diferentes 
+	 * campos a presentar y compensa mediante la inclusión de espacios en blanco.
 	 * La salida debe quedar tabulada como sigue:
 
-Producto                Precio             Fabricante
------------------------------------------------------
-GeForce GTX 1080 Xtreme|611.5500000000001 |Crucial
-Portátil Yoga 520      |452.79            |Lenovo
-Portátil Ideapd 320    |359.64000000000004|Lenovo
-Monitor 27 LED Full HD |199.25190000000003|Asus
+		Producto                Precio             Fabricante
+		-----------------------------------------------------
+		GeForce GTX 1080 Xtreme|611.5500000000001 |Crucial
+		Portátil Yoga 520      |452.79            |Lenovo
+		Portátil Ideapd 320    |359.64000000000004|Lenovo
+		Monitor 27 LED Full HD |199.25190000000003|Asus
 
 	 */		
 	@Test
 	void test27() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var listMayor180 = listProds.stream()
+						.filter( p -> p.getPrecio() >= 180)
+						.sorted(comparing((Producto p)-> p.getPrecio(),reverseOrder())
+						.thenComparing((Producto p) -> p.getNombre()))
+						.map( p-> p.getNombre() + " ; Precio: " + p.getPrecio() 
+						+ " ; Fabricante:" + p.getFabricante().getNombre())
+						.toList();	
+		listMayor180.forEach(System.out::println);
+						
 	}
 	
 	/**
@@ -561,7 +604,15 @@ Fabricante: Xiaomi
 	@Test
 	void test31() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var numFabsCon = listProds.stream()
+					.map(p -> p.getFabricante().getCodigo())
+					.distinct()
+					.count();
+
+		System.out.println(numFabsCon);
+		Assertions.assertEquals(7, numFabsCon);
+
 	}
 	
 	/**
