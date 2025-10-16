@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.Arrays;
 
 import static java.util.Comparator.comparing;
@@ -508,15 +510,23 @@ class TiendaApplicationTests {
 	void test27() {
 		var listProds = prodRepo.findAll();
 
+		long longNom = listProds.stream()
+					.mapToLong(p -> p.getNombre().length()).max().orElse(0);
+
+		long longPrecio = listProds.stream()
+					.mapToLong(p -> BigDecimal.valueOf(p.getPrecio())
+					.setScale(2,RoundingMode.HALF_UP).toString().length()).max().orElse(0);		
+
 		var listMayor180 = listProds.stream()
 						.filter( p -> p.getPrecio() >= 180)
 						.sorted(comparing((Producto p)-> p.getPrecio(),reverseOrder())
 						.thenComparing((Producto p) -> p.getNombre()))
-						.map( p-> p.getNombre() + " ; Precio: " + p.getPrecio() 
-						+ " ; Fabricante:" + p.getFabricante().getNombre())
-						.toList();	
-		listMayor180.forEach(System.out::println);
-						
+
+						.map (p -> p.getNombre()
+						+ " ".repeat((int)longNom - p.getNombre().length()));
+						//+"|"+ BigDecimal.valueOf(p.getPrecio().setScale(2,RoundingMode.HALF_UP)).collect(joining("\n"));
+
+		System.out.println(listMayor180);
 	}
 	
 	/**
@@ -576,7 +586,14 @@ Fabricante: Xiaomi
 	@Test
 	void test28() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		
+		var listFabsConP = listFabs.stream()
+						.filter( f -> f.getProductos() != null)
+						.map(f -> f.getProductos())
+						.toList();
+		listFabsConP.forEach(System.out::println);
+
+
 	}
 	
 	/**
@@ -585,7 +602,11 @@ Fabricante: Xiaomi
 	@Test
 	void test29() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+
+		
+
+
+
 	}
 	
 	/**
@@ -594,7 +615,13 @@ Fabricante: Xiaomi
 	@Test
 	void test30() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listNumTotal = listProds.stream()
+						.map(p -> p.getNombre())
+						.count();
+		System.out.println(listNumTotal);
+		Assertions.assertEquals(11, listNumTotal);
+
 	}
 
 	
@@ -621,7 +648,10 @@ Fabricante: Xiaomi
 	@Test
 	void test32() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+		var listMedia = listProds.stream().map(p-> p.getPrecio());
+		
+
 	}
 	
 	/**
