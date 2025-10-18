@@ -773,11 +773,23 @@ Hewlett-Packard              2
          Xiaomi              0
 
 	 */
-	@Test
-	void test38() {
-		var listFabs = fabRepo.findAll();
-		//TODO
-	}
+    @Test
+    void test38() {
+        var listFabs = fabRepo.findAll();
+
+        System.out.println("Fabricante           #Productos");
+        System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+
+        listFabs.stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getProductos().size(), f1.getProductos().size()))
+                .forEach(fab -> {
+                    int cantidad = fab.getProductos().size();
+                    String linea = String.format("%-20s %10d", fab.getNombre(), cantidad);
+                    System.out.println(linea);
+                });
+
+
+}
 	
 	/**
 	 * 39. Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes. 
